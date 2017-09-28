@@ -1,10 +1,15 @@
 package gemini
 
 import (
-  "net/http"
-  "bytes"
-  "encoding/json"
-  "fmt"
+  	"net/http"
+  	"bytes"
+  	"encoding/json"
+  	"fmt"
+	"encoding/hex"
+	"encoding/base64"
+	"crypto/hmac"
+	"crypto/sha512"
+	"time"
 )
 
 
@@ -17,7 +22,7 @@ type Client struct {
 
 func NewClient(secret, key, passphrase string) *Client {
 	client := Client{
-		BaseURL:    "https://api.gemini.com/v1",
+		BaseURL:    "http://api.sandbox.gemini.com/v1",
 		Secret:     secret,
 		Key:        key,
 		Passphrase: passphrase,
@@ -43,6 +48,17 @@ func (c *Client) Request(method string, url string, params, result interface{}) 
 	if err != nil {
 		return res, err
 	}
+	
+	reqStr, _ := json.Marshal(&params)
+	payload := base64.StdEncoding.EncodeToString([]byte(reqStr))
+
+	signature := makeSig(c.Secret, payload)
+
+	req.Header.Add("X-GEMINI-APIKEY", c.Key)
+	req.Header.Add("X-GEMINI-PAYLOAD", payload)
+	req.Header.Add("X-GEMINI-SIGNATURE", signature)	
+	fmt.Println(req)
+
 	client := http.Client{}
 	res, err = client.Do(req)
 	if err != nil {
@@ -67,4 +83,17 @@ func (c *Client) Request(method string, url string, params, result interface{}) 
 		}
 	}
 	return res, nil
+}
+
+func Nonce() int64 {
+	return time.Now().UnixNano()
+}
+
+func makeSig(secret, payload string) string {
+	mac := hmac.New(sha512.New384, []byte(secret))
+	mac.Write([]byte(payload))
+
+	signature := hex.EncodeToString(mac.Sum(nil))
+
+	return signature
 }
