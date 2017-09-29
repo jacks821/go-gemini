@@ -15,7 +15,7 @@ type Trade struct {
 
 func (c *Client) GetTrades(symbol string) ([]Trade, error) {
   var trades []Trade
-  requestURL := fmt.Sprintf("/trades/%s", symbol)
+  requestURL := fmt.Sprintf("/v1/trades/%s", symbol)
 
   _, err := c.Request("GET", requestURL, nil, &trades)
   return trades, err

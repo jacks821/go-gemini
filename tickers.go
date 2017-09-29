@@ -21,7 +21,7 @@ type Volume struct {
 
 func (c *Client) GetTicker(symbol string) (Ticker, error) {
   var ticker Ticker
-  requestURL := fmt.Sprintf("/pubticker/%s", symbol)
+  requestURL := fmt.Sprintf("/v1/pubticker/%s", symbol)
 
   _, err := c.Request("GET", requestURL, nil, &ticker)
   return ticker, err

@@ -34,7 +34,7 @@ func (c *Client) NewOrder(price float64, amount float64, side, symbol string) (O
 	var order Order
 
 
-	requestURL := fmt.Sprintf("/order/new")
+	requestURL := fmt.Sprintf("/v1/order/new")
 
 	params := &Request{
 			Url:		requestURL,
@@ -55,7 +55,7 @@ func (c *Client) CancelOrder(id int64) (*http.Response, error) {
 	var order *http.Response
 
 
-	requestURL := fmt.Sprintf("/order/cancel")
+	requestURL := fmt.Sprintf("/v1/order/cancel")
 
 	params := &Request{
 			Url:		requestURL,
@@ -72,7 +72,7 @@ func (c *Client) CancelSessionOrders() (bool, error) {
 	var result bool
 
 
-	requestURL := fmt.Sprintf("/order/cancel/session")
+	requestURL := fmt.Sprintf("/v1/order/cancel/session")
 
 	params := &Request{
 			Url:		requestURL,
@@ -88,7 +88,7 @@ func (c *Client) CancelAllOrders() (bool, error) {
 	var result bool
 
 
-	requestURL := fmt.Sprintf("/order/cancel/all")
+	requestURL := fmt.Sprintf("/v1/order/cancel/all")
 
 	params := &Request{
 			Url:		requestURL,
@@ -104,7 +104,7 @@ func (c *Client) OrderStatus(id int64) (Order, error) {
 	var order Order
 
 
-	requestURL := fmt.Sprintf("/order/status")
+	requestURL := fmt.Sprintf("/v1/order/status")
 
 	params := &Request{
 			Url:		requestURL,
@@ -114,14 +114,14 @@ func (c *Client) OrderStatus(id int64) (Order, error) {
 
   	_, err := c.Request("POST", requestURL, params, &order)
 
-	return result, err
+	return order, err
 }
 
-func (c *Client) ActiveOrders() (bool, error) {
+func (c *Client) ActiveOrders() ([]Order, error) {
 	var orders []Order
 
 
-	requestURL := fmt.Sprintf("/orders")
+	requestURL := fmt.Sprintf("/v1/orders")
 
 	params := &Request{
 			Url:		requestURL,
@@ -130,7 +130,7 @@ func (c *Client) ActiveOrders() (bool, error) {
 
   	_, err := c.Request("POST", requestURL, params, &orders)
 
-	return result, err
+	return orders, err
 }
 
 

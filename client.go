@@ -22,7 +22,7 @@ type Client struct {
 
 func NewClient(secret, key, passphrase string) *Client {
 	client := Client{
-		BaseURL:    "http://api.sandbox.gemini.com/v1",
+		BaseURL:    "https://api.gemini.com/",
 		Secret:     secret,
 		Key:        key,
 		Passphrase: passphrase,
@@ -68,6 +68,8 @@ func (c *Client) Request(method string, url string, params, result interface{}) 
 		return res, err
 	}
 	defer res.Body.Close()
+
+	fmt.Println(res.StatusCode)
 
 	if res.StatusCode != 200 {
 		defer res.Body.Close()

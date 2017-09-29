@@ -35,7 +35,7 @@ type HistoricalAuction struct {
 
 func (c *Client) GetCurrentAuction(symbol string) (CurrentAuction, error) {
   var auction CurrentAuction
-  requestURL := fmt.Sprintf("/auction/%s", symbol)
+  requestURL := fmt.Sprintf("/v1/auction/%s", symbol)
 
   _, err := c.Request("GET", requestURL, nil, &auction)
   return auction, err
@@ -43,7 +43,7 @@ func (c *Client) GetCurrentAuction(symbol string) (CurrentAuction, error) {
 
 func (c *Client) GetHistoricalAuction(symbol string) ([]HistoricalAuction, error) {
   var auctions []HistoricalAuction
-  requestURL := fmt.Sprintf("/auction/%s/history", symbol)
+  requestURL := fmt.Sprintf("/v1/auction/%s/history", symbol)
 
   _, err := c.Request("GET", requestURL, nil, &auctions)
   return auctions, err

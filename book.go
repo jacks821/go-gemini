@@ -23,7 +23,7 @@ type Ask struct {
 
 func (c *Client) GetBook(symbol string) (Orders, error) {
   var orders Orders
-  requestURL := fmt.Sprintf("/book/%s", symbol)
+  requestURL := fmt.Sprintf("/v1/book/%s", symbol)
 
   _, err := c.Request("GET", requestURL, nil, &orders)
   return orders, err
