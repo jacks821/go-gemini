@@ -2,6 +2,7 @@ package gemini
 
 import (
 	"fmt"
+	"net/http"
 )
 
 
@@ -45,10 +46,93 @@ func (c *Client) NewOrder(price float64, amount float64, side, symbol string) (O
 			OrderType:	"exchange limit",
 		}		
 
-  	_, err := c.Request("GET", requestURL, params, &order)
+  	_, err := c.Request("POST", requestURL, params, &order)
 
 	return order, err
 }
+
+func (c *Client) CancelOrder(id int64) (*http.Response, error) {
+	var order *http.Response
+
+
+	requestURL := fmt.Sprintf("/order/cancel")
+
+	params := &Request{
+			Url:		requestURL,
+			nonce:		Nonce(),
+			OrderID:	string(id),
+		}		
+
+  	_, err := c.Request("POST", requestURL, params, &order)
+
+	return order, err
+}
+
+func (c *Client) CancelSessionOrders() (bool, error) {
+	var result bool
+
+
+	requestURL := fmt.Sprintf("/order/cancel/session")
+
+	params := &Request{
+			Url:		requestURL,
+			nonce:		Nonce(),
+		}		
+
+  	_, err := c.Request("POST", requestURL, params, &result)
+
+	return result, err
+}
+
+func (c *Client) CancelAllOrders() (bool, error) {
+	var result bool
+
+
+	requestURL := fmt.Sprintf("/order/cancel/all")
+
+	params := &Request{
+			Url:		requestURL,
+			nonce:		Nonce(),
+		}		
+
+  	_, err := c.Request("POST", requestURL, params, &result)
+
+	return result, err
+}
+
+func (c *Client) OrderStatus(id int64) (Order, error) {
+	var order Order
+
+
+	requestURL := fmt.Sprintf("/order/status")
+
+	params := &Request{
+			Url:		requestURL,
+			nonce:		Nonce(),
+			OrderID:	string(id),
+		}		
+
+  	_, err := c.Request("POST", requestURL, params, &order)
+
+	return result, err
+}
+
+func (c *Client) ActiveOrders() (bool, error) {
+	var orders []Order
+
+
+	requestURL := fmt.Sprintf("/orders")
+
+	params := &Request{
+			Url:		requestURL,
+			nonce:		Nonce(),
+		}		
+
+  	_, err := c.Request("POST", requestURL, params, &orders)
+
+	return result, err
+}
+
 
 
 

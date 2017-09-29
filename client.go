@@ -53,6 +53,9 @@ func (c *Client) Request(method string, url string, params, result interface{}) 
 	payload := base64.StdEncoding.EncodeToString([]byte(reqStr))
 
 	signature := makeSig(c.Secret, payload)
+	
+	req.Header.Add("Content-Length", "0")
+	req.Header.Add("Content-Type", "text/plain")
 
 	req.Header.Add("X-GEMINI-APIKEY", c.Key)
 	req.Header.Add("X-GEMINI-PAYLOAD", payload)
