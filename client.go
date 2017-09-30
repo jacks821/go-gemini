@@ -2,7 +2,6 @@ package gemini
 
 import (
   	"net/http"
-  	"bytes"
   	"encoding/json"
   	"fmt"
 	"encoding/hex"
@@ -10,6 +9,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha512"
 	"time"
+	"io/ioutil"
 )
 
 
@@ -22,7 +22,7 @@ type Client struct {
 
 func NewClient(secret, key, passphrase string) *Client {
 	client := Client{
-		BaseURL:    "https://api.gemini.com/",
+		BaseURL:    "https://api.gemini.com",
 		Secret:     secret,
 		Key:        key,
 		Passphrase: passphrase,
@@ -31,45 +31,39 @@ func NewClient(secret, key, passphrase string) *Client {
 	return &client
 }
 
-func (c *Client) Request(method string, url string, params, result interface{}) (res *http.Response, err error) {
-	var data []byte
-	body := bytes.NewReader(make([]byte, 0))
+func (c *Client) Request(method string, url string, params Request, result interface{}) (res *http.Response, err error) {
 
-	if params != nil {
-		data, err = json.Marshal(params)
-		if err != nil {
-			return res, err
-		}
-		body = bytes.NewReader(data)
-	}
-
-	fullURL := fmt.Sprintf("%s%s", c.BaseURL, url)
-	req, err := http.NewRequest(method, fullURL, body)
+	fullURL := fmt.Sprintf("%s%s", c.BaseURL, params.GetRoute())
+	req, err := http.NewRequest(method, fullURL, nil)
 	if err != nil {
 		return res, err
 	}
-	
-	reqStr, _ := json.Marshal(&params)
-	payload := base64.StdEncoding.EncodeToString([]byte(reqStr))
 
-	signature := makeSig(c.Secret, payload)
+	
+	payload := base64.StdEncoding.EncodeToString(params.GetPayload())
+
+	h := hmac.New(sha512.New384, []byte(c.Secret))
+	h.Write([]byte(payload))
+	sig := h.Sum(nil)
+
+
+
 	
 	req.Header.Add("Content-Length", "0")
 	req.Header.Add("Content-Type", "text/plain")
 
 	req.Header.Add("X-GEMINI-APIKEY", c.Key)
 	req.Header.Add("X-GEMINI-PAYLOAD", payload)
-	req.Header.Add("X-GEMINI-SIGNATURE", signature)	
-	fmt.Println(req)
+	req.Header.Add("X-GEMINI-SIGNATURE", hex.EncodeToString(sig))	
 
 	client := http.Client{}
 	res, err = client.Do(req)
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 	defer res.Body.Close()
-
-	fmt.Println(res.StatusCode)
+	
+	fmt.Println(req)
 
 	if res.StatusCode != 200 {
 		defer res.Body.Close()
@@ -80,13 +74,17 @@ func (c *Client) Request(method string, url string, params, result interface{}) 
 		}
 		return res, error(geminiError)
 	}
+	
+	var body []byte
 
-	if result != nil {
-		decoder := json.NewDecoder(res.Body)
-		if err = decoder.Decode(result); err != nil {
-			return res, err
-		}
+	body, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
 	}
+
+	
+	json.Unmarshal(body, &result)
+	
 	return res, nil
 }
 
@@ -94,11 +92,3 @@ func Nonce() int64 {
 	return time.Now().UnixNano()
 }
 
-func makeSig(secret, payload string) string {
-	mac := hmac.New(sha512.New384, []byte(secret))
-	mac.Write([]byte(payload))
-
-	signature := hex.EncodeToString(mac.Sum(nil))
-
-	return signature
-}

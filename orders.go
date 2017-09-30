@@ -19,9 +19,9 @@ type Order struct {
 	options		[]string	`json:"options"`
 	Timestamp	int64   	`json:"timestamp,string"`
 	Timestamppms  	int64  		`json:"timestampms"`
-	IsLive		bool		`json:"is_live"`
-	IsCancelled	bool		`json:"is_cancelled"`
-	WasForced	bool		`json:"was_forced"`
+	IsLive		bool		`json:"is_live,string"`
+	IsCancelled	bool		`json:"is_cancelled,string"`
+	WasForced	bool		`json:"was_forced,string"`
 	ExecAmount	float64		`json:"executed_amount,string"`
 	RemainAmount	float64		`json:"remaining_amount,string"`
 	OrigAmount	float64		`json:"original_amount,string"`
@@ -33,12 +33,12 @@ type Order struct {
 func (c *Client) NewOrder(price float64, amount float64, side, symbol string) (Order, error) {
 	var order Order
 
-
+	getNonce := Nonce()
 	requestURL := fmt.Sprintf("/v1/order/new")
 
-	params := &Request{
+	params := &NewOrderRequest{
 			Url:		requestURL,
-			nonce:		Nonce(),
+			Nonce:		getNonce,
 			Symbol:		symbol,
 			Amount:		fmt.Sprint(amount),
 			Price:		fmt.Sprint(price),			
@@ -54,12 +54,12 @@ func (c *Client) NewOrder(price float64, amount float64, side, symbol string) (O
 func (c *Client) CancelOrder(id int64) (*http.Response, error) {
 	var order *http.Response
 
-
+	getNonce := Nonce()
 	requestURL := fmt.Sprintf("/v1/order/cancel")
 
-	params := &Request{
+	params := &OrderStatusRequest{
 			Url:		requestURL,
-			nonce:		Nonce(),
+			Nonce:		getNonce,
 			OrderID:	string(id),
 		}		
 
@@ -70,13 +70,14 @@ func (c *Client) CancelOrder(id int64) (*http.Response, error) {
 
 func (c *Client) CancelSessionOrders() (bool, error) {
 	var result bool
-
+	
+	getNonce := Nonce()
 
 	requestURL := fmt.Sprintf("/v1/order/cancel/session")
 
-	params := &Request{
+	params := &BasicRequest{
 			Url:		requestURL,
-			nonce:		Nonce(),
+			Nonce:		getNonce,
 		}		
 
   	_, err := c.Request("POST", requestURL, params, &result)
@@ -86,13 +87,14 @@ func (c *Client) CancelSessionOrders() (bool, error) {
 
 func (c *Client) CancelAllOrders() (bool, error) {
 	var result bool
-
+	
+	getNonce := Nonce()
 
 	requestURL := fmt.Sprintf("/v1/order/cancel/all")
 
-	params := &Request{
+	params := &BasicRequest{
 			Url:		requestURL,
-			nonce:		Nonce(),
+			Nonce:		getNonce,
 		}		
 
   	_, err := c.Request("POST", requestURL, params, &result)
@@ -102,13 +104,14 @@ func (c *Client) CancelAllOrders() (bool, error) {
 
 func (c *Client) OrderStatus(id int64) (Order, error) {
 	var order Order
-
+	
+	getNonce := Nonce()
 
 	requestURL := fmt.Sprintf("/v1/order/status")
 
-	params := &Request{
+	params := &OrderStatusRequest{
 			Url:		requestURL,
-			nonce:		Nonce(),
+			Nonce:		getNonce,
 			OrderID:	string(id),
 		}		
 
@@ -120,12 +123,13 @@ func (c *Client) OrderStatus(id int64) (Order, error) {
 func (c *Client) ActiveOrders() ([]Order, error) {
 	var orders []Order
 
+	getNonce := Nonce()
 
 	requestURL := fmt.Sprintf("/v1/orders")
 
-	params := &Request{
+	params := &BasicRequest{
 			Url:		requestURL,
-			nonce:		Nonce(),
+			Nonce:		getNonce,
 		}		
 
   	_, err := c.Request("POST", requestURL, params, &orders)
