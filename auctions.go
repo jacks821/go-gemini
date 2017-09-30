@@ -4,6 +4,7 @@ import (
   "fmt"
 )
 
+//CurrentAuction will be the return of GetCurrentAuction
 type CurrentAuction struct {
   ClosedUntil   int64 `json:"closed_until_ms"`
   LastAuctionEID  int64  `json:"last_auction_eid"`
@@ -19,6 +20,7 @@ type CurrentAuction struct {
   NextAuction         int64 `json:"next_auction_ms"`
 }
 
+//HistoricalAuction will be the return to GetHistoricalAuction 
 type HistoricalAuction struct {
   Timestamp   int64 `json:"timestamp"`
   Timestamppms  int64  `json:"timestampms"`
@@ -33,6 +35,7 @@ type HistoricalAuction struct {
 }
 
 
+//GetCurrentAuction gets a list of the current auctions on the Gemini exchange
 func (c *Client) GetCurrentAuction(symbol string) (CurrentAuction, error) {
   var auction CurrentAuction
   requestURL := fmt.Sprintf("/v1/auction/%s", symbol)
@@ -41,6 +44,7 @@ func (c *Client) GetCurrentAuction(symbol string) (CurrentAuction, error) {
   return auction, err
 }
 
+//GetHistoricalAuction gets a list of the Historical Auctions on the exchange
 func (c *Client) GetHistoricalAuction(symbol string) ([]HistoricalAuction, error) {
   var auctions []HistoricalAuction
   requestURL := fmt.Sprintf("/v1/auction/%s/history", symbol)

@@ -2,6 +2,7 @@ package gemini
 
 import "fmt"
 
+//TradeVolume includes all of the fields for a request for GetTradeVolume
 type TradeVolume struct {
 	AccountID		string		`json:"account_id"`
 	Symbol			string		`json:"symbol"`
@@ -23,6 +24,7 @@ type TradeVolume struct {
 	SellTakerCount		float64		`json:"sell_taker_count,string"`
 }
 
+//Trade contains all the fields a Gemini trade should have
 type Trade struct {
   Timestamp   int64 `json:"timestamp"`
   Timestamppms  int64  `json:"timestampms"`
@@ -34,6 +36,7 @@ type Trade struct {
   Broken      bool      `json:"broken,string"`
 }
 
+//GetTrades gets a list of trades from Gemini.
 func (c *Client) GetTrades(symbol string) ([]Trade, error) {
   var trades []Trade
   requestURL := fmt.Sprintf("/v1/trades/%s", symbol)
@@ -42,6 +45,7 @@ func (c *Client) GetTrades(symbol string) ([]Trade, error) {
   return trades, err
 }
 
+//GetMyTrades returns your individual trades
 func (c *Client) GetMyTrades(symbol string) ([]Trade, error) {
   	var trades []Trade
   	requestURL := fmt.Sprintf("/v1/mytrades")
@@ -60,6 +64,7 @@ func (c *Client) GetMyTrades(symbol string) ([]Trade, error) {
   	return trades, err
 }
 
+//GetTradeVolume returns the trade volume on the exchange for up to 30 days.
 func (c *Client) GetTradeVolume() ([]TradeVolume, error) {
 	var volume []TradeVolume
 

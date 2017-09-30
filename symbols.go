@@ -4,7 +4,7 @@ import (
   "fmt"
 )
 
-
+//GetSymbols returns a list of the symbols actively traded on the Gemini exchange.
 func (c *Client) GetSymbols() ([]string, error) {
   var symbols []string
   requestURL := fmt.Sprintf("/v1/symbols")

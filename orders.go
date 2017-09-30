@@ -6,10 +6,10 @@ import (
 )
 
 
-
+//Order will be the return of most of the orders endpoints.
 type Order struct {
-	Id		int64 		`json:"order_id"`
-	ClientOrderId	int64		`json:"client_order_id"`
+	ID		int64 		`json:"order_id"`
+	ClientOrderID	int64		`json:"client_order_id"`
 	Symbol		string		`json:"symbol"`
 	Exchange	string		`json:"exchange"`
 	price		float64		`json:",string"`
@@ -29,7 +29,7 @@ type Order struct {
 }
 
 
-
+//NewOrder creates a new order on the Gemini exchange.
 func (c *Client) NewOrder(price float64, amount float64, side, symbol string) (Order, error) {
 	var order Order
 
@@ -51,6 +51,7 @@ func (c *Client) NewOrder(price float64, amount float64, side, symbol string) (O
 	return order, err
 }
 
+//CancelOrder cancels an existing Order that has not been filled. Requires the ID of the order to cancel.
 func (c *Client) CancelOrder(id int64) (*http.Response, error) {
 	var order *http.Response
 
@@ -68,6 +69,7 @@ func (c *Client) CancelOrder(id int64) (*http.Response, error) {
 	return order, err
 }
 
+//CancelSessionOrders cancels all orders created in a given session. Returns a boolean.
 func (c *Client) CancelSessionOrders() (bool, error) {
 	var result bool
 	
@@ -85,6 +87,7 @@ func (c *Client) CancelSessionOrders() (bool, error) {
 	return result, err
 }
 
+//CancelAllOrders cancels all outstanding Orders that have not been filled.
 func (c *Client) CancelAllOrders() (bool, error) {
 	var result bool
 	
@@ -102,6 +105,7 @@ func (c *Client) CancelAllOrders() (bool, error) {
 	return result, err
 }
 
+//OrderStatus returns the status of a given order by taking it's ID.
 func (c *Client) OrderStatus(id int64) (Order, error) {
 	var order Order
 	
@@ -120,6 +124,7 @@ func (c *Client) OrderStatus(id int64) (Order, error) {
 	return order, err
 }
 
+//ActiveOrders returns a list of the active orders.
 func (c *Client) ActiveOrders() ([]Order, error) {
 	var orders []Order
 

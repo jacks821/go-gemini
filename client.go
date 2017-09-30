@@ -12,7 +12,7 @@ import (
 	"io/ioutil"
 )
 
-
+//Client is a Basic client which has information to send to the Gemini API
 type Client struct {
   BaseURL         string
   Passphrase      string
@@ -20,6 +20,7 @@ type Client struct {
   Key             string
 }
 
+//NewClient creates a new client with the given API Secret, API Key and Passphrase (although I will probably remove passphrase.
 func NewClient(secret, key, passphrase string) *Client {
 	client := Client{
 		BaseURL:    "https://api.gemini.com",
@@ -31,6 +32,7 @@ func NewClient(secret, key, passphrase string) *Client {
 	return &client
 }
 
+//Request takes a client, an HTTP method, a URL and a set of params and creates an HTTP request which the Gemini Endpoints can respond to.
 func (c *Client) Request(method string, url string, params Request, result interface{}) (res *http.Response, err error) {
 
 	fullURL := fmt.Sprintf("%s%s", c.BaseURL, params.GetRoute())
@@ -88,6 +90,7 @@ func (c *Client) Request(method string, url string, params Request, result inter
 	return res, nil
 }
 
+//Nonce returns a nonce using a time, so it is always increasing
 func Nonce() int64 {
 	return time.Now().UnixNano()
 }
